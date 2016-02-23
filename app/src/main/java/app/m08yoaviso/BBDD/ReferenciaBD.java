@@ -7,10 +7,9 @@ import com.firebase.client.Firebase;
 /**
  * Created by Moises on 22/02/2016.
  */
-public class Reference extends Application {
+public class ReferenciaBD extends Application {
 
     private Firebase ref;
-
 
     @Override
     public void onCreate() {

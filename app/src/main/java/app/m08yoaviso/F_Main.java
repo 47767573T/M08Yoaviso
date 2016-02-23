@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
+import android.location.LocationListener;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -32,7 +34,7 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class F_Main extends Fragment {
+public class F_Main extends Fragment implements LocationListener{
 
 
     //CONSTRUCTOR
@@ -41,6 +43,11 @@ public class F_Main extends Fragment {
 
     //Referencia a BBDD Firebase
     private Firebase ref;
+    private String[] filtros;
+    private int radioFiltros;
+
+    //Variables de localización
+
 
     //Variables para mapa
     private MapView map;
@@ -51,7 +58,7 @@ public class F_Main extends Fragment {
 
 
     //Variables para configuracion del mapa
-    private int radioAgrupacion = 50; //metros para agrupar
+    private int radioAgrupacion = 25; //metros para agrupar
     private boolean hayControlZoom = true;
     private boolean hayControlMultiTouch = true;
     private boolean hayCentradoInicial = true;
@@ -79,7 +86,6 @@ public class F_Main extends Fragment {
         try {
             //Determinamos los tiles del mapa para pintarlo
             map.setTileSource(TileSourceFactory.MAPQUESTOSM);
-            map.setTileSource(TileSourceFactory.)
             map.setTilesScaledToDpi(true);
 
             //Determinamos otras opciones del mapa
@@ -150,7 +156,7 @@ public class F_Main extends Fragment {
                     notaMarker.setAlpha(0.7f);
 
                     agrupacionNotaMarkers.add(notaMarker);
-                    
+
                 }
                 agrupacionNotaMarkers.invalidate();
                 map.invalidate();
@@ -190,4 +196,23 @@ public class F_Main extends Fragment {
         }
     }
 
+    @Override
+    public void onLocationChanged(Location location) {
+
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
 }

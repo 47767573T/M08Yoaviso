@@ -9,8 +9,10 @@ public class Yoaviso {
 
     public Yoaviso(){ }
 
-    private Map<String , Aviso> avisos;
+    private Map<Integer , Aviso> avisos;
     private Map<Integer , Usuario> usuarios;
 
-
 }
+
+
+//TODO: implementar los contructores getters y setters cuando se definan todas las variables
