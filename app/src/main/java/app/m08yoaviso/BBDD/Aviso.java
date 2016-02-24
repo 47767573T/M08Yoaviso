@@ -10,6 +10,10 @@ public class Aviso {
     private int id;
     private GeoPoint gp;
 
+    public Aviso(int id, GeoPoint gp) {
+        this.id = id;
+        this.gp = gp;
+    }
 }
 
 //TODO: implementar los contructores getters y setters cuando se definan todas las variables

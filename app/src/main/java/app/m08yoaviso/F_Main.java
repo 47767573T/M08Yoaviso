@@ -1,11 +1,14 @@
 package app.m08yoaviso;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
+import android.location.LocationManager;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -31,6 +34,9 @@ import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import app.m08yoaviso.BBDD.ReferenciaBD;
+import app.m08yoaviso.BBDD.Yoaviso;
+
 /**
  * A placeholder fragment containing a simple view.
  */
@@ -47,7 +53,9 @@ public class F_Main extends Fragment implements LocationListener{
     private int radioFiltros;
 
     //Variables de localización
-
+    public Location lugarActual;
+    LocationManager locManager;
+    LocationListener locListener;
 
     //Variables para mapa
     private MapView map;
@@ -78,6 +86,22 @@ public class F_Main extends Fragment implements LocationListener{
         setZoom(zoomInicial);
         setOverlays(getContext());
         drawMarkers(getContext());
+        ReferenciaBD refYoaviso = (ReferenciaBD) getActivity().getApplication();
+        ref = refYoaviso.getRef();
+
+
+        //Configuracion listeners
+        setLocationListeners(getContext());
+
+
+        //TODO borrar despues de definir los POJOs y comenzaar a grabar
+        //Registros añadidos a Firebase para pruebas
+        addAvisosPrueba(10, ref);
+
+        //TODO //fin de los registros de prueba
+
+
+
 
         return mainView;
     }
@@ -139,12 +163,12 @@ public class F_Main extends Fragment implements LocationListener{
     public void drawMarkers (Context context){
         setAgrupacionMarkers(context, radioAgrupacion);
 
-        final Firebase notas = ref.child("prueba").child("Notas");
+        Firebase notas = ref.child("prueba").child("Notas");
         notas.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot notasFireBase : dataSnapshot.getChildren()) {
-
+/*
                     Nota nota = notasFireBase.getValue(Nota.class);
                     Marker notaMarker = new Marker(map);
                     GeoPoint gp = new GeoPoint(nota.getLatitud(), nota.getLongitud());
@@ -154,8 +178,8 @@ public class F_Main extends Fragment implements LocationListener{
                     notaMarker.setIcon(getResources().getDrawable(android.R.drawable.ic_menu_info_details));
                     notaMarker.setTitle(nota.getTitulo());
                     notaMarker.setAlpha(0.7f);
-
-                    agrupacionNotaMarkers.add(notaMarker);
+*/
+                    //agrupacionNotaMarkers.add(notaMarker);
 
                 }
                 agrupacionNotaMarkers.invalidate();
@@ -182,6 +206,15 @@ public class F_Main extends Fragment implements LocationListener{
         agrupacionNotaMarkers.setRadius(radio);
     }
 
+    public void addAvisosPrueba(int numVeces, Firebase firebase){
+        for (int i = 0; i < numVeces ; i++) {
+
+
+
+
+        }
+    }
+
     public void msgToast(int numTag, String msg) {
         switch (numTag) {
             case 1:
@@ -196,23 +229,39 @@ public class F_Main extends Fragment implements LocationListener{
         }
     }
 
+    //METODOS PARA LOCATION LISTENER................................................................
+    public void setLocationListeners(Context context) {
+        locManager = (LocationManager) getContext().getSystemService(context.LOCATION_SERVICE);
+
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return ;
+        }
+        locManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+    }
+
+    private int checkSelfPermission(String accessFineLocation) {return 0;}
+
+
     @Override
     public void onLocationChanged(Location location) {
-
+        locListener = this;
+        if (location!=null) {
+            lugarActual = location;
+        }else{
+            msgToast(2, "No se encuentra Location");
+        }
     }
 
     @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
+    public void onStatusChanged(String provider, int status, Bundle extras) {}
 
     @Override
-    public void onProviderEnabled(String provider) {
-
-    }
+    public void onProviderEnabled(String provider) {msgToast(3, "Red Activada");}
 
     @Override
-    public void onProviderDisabled(String provider) {
+    public void onProviderDisabled(String provider) {msgToast(3, "Red Desactivada");}
+    //FIN DE METODOS PARA LOCATION LISTENER.........................................................
 
-    }
+
 }

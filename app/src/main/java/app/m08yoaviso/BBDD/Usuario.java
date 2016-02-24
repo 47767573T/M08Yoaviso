@@ -12,10 +12,14 @@ public class Usuario {
     private Map<Integer , String> favoritos; //<id del aviso, comentario>
     private Map<Integer , Boolean> avisos; //<id del aviso, anonimato>
 
-    public Usuario(String pw) {
-        this.pw = pw;
-    }
+    public Usuario(String pw) { this.pw = pw; }
 
+
+    public Usuario(String pw, Map<Integer, String> favoritos, Map<Integer, Boolean> avisos) {
+        this.pw = pw;
+        this.favoritos = favoritos;
+        this.avisos = avisos;
+    }
 }
 
 
