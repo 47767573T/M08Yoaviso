@@ -9,18 +9,24 @@ import java.util.Map;
 public class Usuario {
 
     private final String pw;
-    private Map<Integer , String> favoritos; //<id del aviso, comentario>
-    private Map<Integer , Boolean> avisos; //<id del aviso, anonimato>
+    private Map<Integer, String> favoritos; //<id del aviso, comentario>
+    private Map<Integer, Boolean> avisos; //<id del aviso, anonimato>
 
+
+    //CONSTRUCTOR
     public Usuario(String pw) { this.pw = pw; }
 
 
-    public Usuario(String pw, Map<Integer, String> favoritos, Map<Integer, Boolean> avisos) {
-        this.pw = pw;
-        this.favoritos = favoritos;
-        this.avisos = avisos;
-    }
+    //GETTERS
+    public String getPw() { return pw; }
+
+    public Map<Integer, String> getFavoritos() { return favoritos; }
+
+    public Map<Integer, Boolean> getAvisos() { return avisos; }
+
+
+    //SETTERS
+    public void setFavoritos(Map<Integer, String> favoritos) { this.favoritos = favoritos; }
+
+    public void setAvisos(Map<Integer, Boolean> avisos) { this.avisos = avisos; }
 }
-
-
-//TODO: implementar los contructores getters y setters cuando se definan todas las variables
