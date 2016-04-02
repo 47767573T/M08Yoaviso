@@ -82,12 +82,13 @@ public class F_Main extends Fragment implements LocationListener, View.OnLongCli
 
         View mainView = inflater.inflate(R.layout.lay_f_main, container, false);
 
-        mainView.setOnLongClickListener(this);
+
 
         ReferenciaBD app = (ReferenciaBD) getActivity().getApplication();
         ref = app.getRef();
         map = (MapView) mainView.findViewById(R.id.mapView);
-        zoomInicial = 30;
+        map.setOnLongClickListener(this);
+        zoomInicial = 100;
 
 
         //Configuraciones iniciales

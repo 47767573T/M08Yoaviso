@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -32,6 +33,9 @@ public class F_Grabar extends Fragment implements View.OnClickListener, View.OnL
     private ImageButton btGrabar;
     private ImageButton btEscuchar;
     private ImageButton btParar;
+    private Button btGuardar;
+    private Button btRepetir;
+    private ImageButton btAtras;
 
     private static final String LOG_TAG = "AudioRecordTest";
 
@@ -52,21 +56,13 @@ public class F_Grabar extends Fragment implements View.OnClickListener, View.OnL
         Date fechaParaAudio = new Date();
         String fechaStr = sdt.format(fechaParaAudio);
 
-        btGrabar = (ImageButton) grabarView.findViewById(R.id.imbtGrabar);
-        btGrabar.setOnClickListener(this);
-        btGrabar.setOnLongClickListener(this);
-
-        btEscuchar = (ImageButton) grabarView.findViewById(R.id.imbtEscuchar);
-        btEscuchar.setOnClickListener(this);
-        btEscuchar.setOnLongClickListener(this);
-
-        btParar = (ImageButton) grabarView.findViewById(R.id.imbtParar);
-        btParar.setOnClickListener(this);
-        btParar.setOnLongClickListener(this);
+        asignarClickListenersABotones(grabarView);
 
         //Deshabilitamos los botones antes de grabar para evitar errores
         btParar.setVisibility(View.INVISIBLE);
         btEscuchar.setVisibility(View.INVISIBLE);
+        btRepetir.setVisibility(View.INVISIBLE);
+        btGuardar.setVisibility(View.INVISIBLE);
 
         outputFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/"+fechaStr+".3gp";
         msgToast(3, "Se guardará en " + "/"+fechaStr+".3gp");
@@ -77,10 +73,36 @@ public class F_Grabar extends Fragment implements View.OnClickListener, View.OnL
         miGrabador.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
         miGrabador.setOutputFile(outputFile);
 
-
         return grabarView;
     }
 
+
+    public void asignarClickListenersABotones(View v) {
+
+        btGrabar = (ImageButton) v.findViewById(R.id.imbtGrabar);
+        btGrabar.setOnClickListener(this);
+        btGrabar.setOnLongClickListener(this);
+
+        btEscuchar = (ImageButton) v.findViewById(R.id.imbtEscuchar);
+        btEscuchar.setOnClickListener(this);
+        btEscuchar.setOnLongClickListener(this);
+
+        btParar = (ImageButton) v.findViewById(R.id.imbtParar);
+        btParar.setOnClickListener(this);
+        btParar.setOnLongClickListener(this);
+
+        btGuardar = (Button) v.findViewById(R.id.bttnGuardar);
+        btGuardar.setOnClickListener(this);
+        btGuardar.setOnLongClickListener(this);
+
+        btRepetir = (Button) v.findViewById(R.id.bttnRepetir);
+        btRepetir.setOnClickListener(this);
+        btRepetir.setOnLongClickListener(this);
+
+        btAtras = (ImageButton) v.findViewById(R.id.imbtAtras);
+        btAtras.setOnClickListener(this);
+        btAtras.setOnLongClickListener(this);
+    }
 
 //CLICK LISTENERS
     @Override
@@ -136,16 +158,43 @@ public class F_Grabar extends Fragment implements View.OnClickListener, View.OnL
                     e.printStackTrace();
                 }
 
-
-
-
                 reproductorAudio.start();
+
+                //Mostramos las opciones posibles tras grabar la voz
                 btGrabar.setVisibility(View.INVISIBLE);
+                btParar.setVisibility(View.INVISIBLE);
+
+                btRepetir.setVisibility(View.VISIBLE);
+                btGuardar.setVisibility(View.VISIBLE);
+
                 msgToast(1, "Reproduciendo grabacion");
                 break;
+
+            case R.id.bttnGuardar:
+
+                //TODO: Definir guardado de audio en firebase
+
+                Intent intentGuardar = new Intent(this.getContext(), A_Main.class);
+                startActivity(intentGuardar);
+
+                break;
+
+            case R.id.bttnRepetir:
+
+                btParar.setVisibility(View.INVISIBLE);
+                btEscuchar.setVisibility(View.INVISIBLE);
+                btRepetir.setVisibility(View.INVISIBLE);
+                btGuardar.setVisibility(View.INVISIBLE);
+
+                break;
+
+            case R.id.imbtAtras:
+
+                Intent intentAtras = new Intent(this.getContext(), A_Main.class);
+                startActivity(intentAtras);
+
+                break;
         }
-        btEscuchar.setVisibility(View.VISIBLE);
-        btGrabar.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -168,6 +217,4 @@ public class F_Grabar extends Fragment implements View.OnClickListener, View.OnL
                 break;
         }
     }
-
-
 }
