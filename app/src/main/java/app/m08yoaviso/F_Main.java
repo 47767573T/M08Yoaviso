@@ -2,6 +2,7 @@ package app.m08yoaviso;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -40,7 +41,7 @@ import app.m08yoaviso.BBDD.Yoaviso;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class F_Main extends Fragment implements LocationListener{
+public class F_Main extends Fragment implements LocationListener, View.OnLongClickListener {
 
 
     //CONSTRUCTOR
@@ -61,7 +62,7 @@ public class F_Main extends Fragment implements LocationListener{
     private MapView map;
     private IMapController iMapController;
     private MyLocationNewOverlay mlno;
-    private RadiusMarkerClusterer agrupacionNotaMarkers;
+    private RadiusMarkerClusterer agrupacionAvisoMarkers;
     private ScaleBarOverlay scaleBarOverlay;
 
 
@@ -81,6 +82,14 @@ public class F_Main extends Fragment implements LocationListener{
 
         View mainView = inflater.inflate(R.layout.lay_f_main, container, false);
 
+        mainView.setOnLongClickListener(this);
+
+        ReferenciaBD app = (ReferenciaBD) getActivity().getApplication();
+        ref = app.getRef();
+        map = (MapView) mainView.findViewById(R.id.mapView);
+        zoomInicial = 30;
+
+
         //Configuraciones iniciales
         setMap();
         setZoom(zoomInicial);
@@ -96,7 +105,7 @@ public class F_Main extends Fragment implements LocationListener{
 
         //TODO borrar despues de definir los POJOs y comenzaar a grabar
         //Registros añadidos a Firebase para pruebas
-        addAvisosPrueba(10, ref);
+        //addAvisosPrueba(10, ref);
 
         //TODO //fin de los registros de prueba
 
@@ -182,7 +191,7 @@ public class F_Main extends Fragment implements LocationListener{
                     //agrupacionNotaMarkers.add(notaMarker);
 
                 }
-                agrupacionNotaMarkers.invalidate();
+                agrupacionAvisoMarkers.invalidate();
                 map.invalidate();
             }
 
@@ -193,17 +202,17 @@ public class F_Main extends Fragment implements LocationListener{
     }
 
     public void setAgrupacionMarkers(Context context, int radio){
-        agrupacionNotaMarkers = new RadiusMarkerClusterer(context);
-        map.getOverlays().add(agrupacionNotaMarkers);
+        agrupacionAvisoMarkers = new RadiusMarkerClusterer(context);
+        map.getOverlays().add(agrupacionAvisoMarkers);
 
-        Drawable clusterIconoDrawable = getResources().getDrawable(android.R.drawable.ic_input_get);
+        Drawable clusterIconoDrawable = getResources().getDrawable(android.R.drawable.stat_sys_warning);
         int markerWidth = clusterIconoDrawable.getIntrinsicWidth();
         int markerHeight = clusterIconoDrawable.getIntrinsicHeight();
         clusterIconoDrawable.setBounds(0, markerHeight, markerWidth, 0);
         Bitmap clusterIconBm = ((BitmapDrawable) clusterIconoDrawable).getBitmap();
 
-        agrupacionNotaMarkers.setIcon(clusterIconBm);
-        agrupacionNotaMarkers.setRadius(radio);
+        agrupacionAvisoMarkers.setIcon(clusterIconBm);
+        agrupacionAvisoMarkers.setRadius(radio);
     }
 
     public void addAvisosPrueba(int numVeces, Firebase firebase){
@@ -229,7 +238,7 @@ public class F_Main extends Fragment implements LocationListener{
         }
     }
 
-    //METODOS PARA LOCATION LISTENER................................................................
+//METODOS PARA LOCATION LISTENER................................................................
     public void setLocationListeners(Context context) {
         locManager = (LocationManager) getContext().getSystemService(context.LOCATION_SERVICE);
 
@@ -261,7 +270,17 @@ public class F_Main extends Fragment implements LocationListener{
 
     @Override
     public void onProviderDisabled(String provider) {msgToast(3, "Red Desactivada");}
-    //FIN DE METODOS PARA LOCATION LISTENER.........................................................
+//FIN DE METODOS PARA LOCATION LISTENER.........................................................
+
+//METODOS PARA CLICK LISTENERS................................................................
+    @Override
+    public boolean onLongClick(View v) {
+
+        Intent intentToGrabar = new Intent(getActivity().getApplication(), A_Grabar.class);
+        startActivity(intentToGrabar);
+
+        return false;
+    }
 
 
 }

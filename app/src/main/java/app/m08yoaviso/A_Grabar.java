@@ -1,38 +1,23 @@
 package app.m08yoaviso;
 
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.ImageButton;
-import android.widget.Toast;
 
-public class A_Main extends AppCompatActivity {
-
-    ImageButton FAB;
+public class A_Grabar extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.lay_a_main);
-
-        FAB = (ImageButton) findViewById(R.id.fab);
-        FAB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intentToGrabar = new Intent(v.getContext(), A_Grabar.class);
-                startActivity(intentToGrabar);
-            }
-        });
+        setContentView(R.layout.lay_a_grabar);
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_a_main, menu);
+        getMenuInflater().inflate(R.menu.menu_a_grabar, menu);
         return true;
     }
 
