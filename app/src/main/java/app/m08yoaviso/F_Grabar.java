@@ -1,6 +1,12 @@
 package app.m08yoaviso;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Environment;
@@ -16,19 +22,29 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.firebase.client.Firebase;
+
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
 
+import app.m08yoaviso.BBDD.Aviso;
+import app.m08yoaviso.BBDD.ReferenciaBD;
+
 /**
  * A placeholder fragment containing a simple view.
  */
-public class F_Grabar extends Fragment implements View.OnClickListener, View.OnLongClickListener {
+public class F_Grabar extends Fragment implements View.OnClickListener, View.OnLongClickListener
+        , LocationListener {
 
+    private Firebase ref;
+    private int numAzar;
 
-    public static final int CODIGO_SOLICITUD_RECONOCIMIENTO = 1;
+    public Location lugarActual;
+    LocationManager locManager;
+    LocationListener locListener;
 
     private ImageButton btGrabar;
     private ImageButton btEscuchar;
@@ -37,14 +53,11 @@ public class F_Grabar extends Fragment implements View.OnClickListener, View.OnL
     private Button btRepetir;
     private ImageButton btAtras;
 
-    private static final String LOG_TAG = "AudioRecordTest";
-
     private static String outputFile;
+    private String nombreArchivo;
     private MediaRecorder miGrabador;
-    private MediaPlayer mPlayer;
 
-    public F_Grabar() {
-    }
+    public F_Grabar() { }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -52,9 +65,15 @@ public class F_Grabar extends Fragment implements View.OnClickListener, View.OnL
 
         View grabarView = inflater.inflate(R.layout.lay_f_grabar, container, false);
 
+        Random rnd = new Random();
+        numAzar = rnd.nextInt(100);
+
+        ReferenciaBD app = (ReferenciaBD) getActivity().getApplication();
+        ref = app.getRef();
+
         SimpleDateFormat sdt = new SimpleDateFormat("EEEyyyyMMddhhmmss");
         Date fechaParaAudio = new Date();
-        String fechaStr = sdt.format(fechaParaAudio);
+        nombreArchivo = sdt.format(fechaParaAudio);
 
         asignarClickListenersABotones(grabarView);
 
@@ -64,8 +83,8 @@ public class F_Grabar extends Fragment implements View.OnClickListener, View.OnL
         btRepetir.setVisibility(View.INVISIBLE);
         btGuardar.setVisibility(View.INVISIBLE);
 
-        outputFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/"+fechaStr+".3gp";
-        msgToast(3, "Se guardará en " + "/"+fechaStr+".3gp");
+        outputFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/"+nombreArchivo+".3gp";
+        msgToast(3, "Se guardará en " + "/"+nombreArchivo+".3gp");
 
         miGrabador = new MediaRecorder();
         miGrabador.setAudioSource(MediaRecorder.AudioSource.MIC);
@@ -75,7 +94,6 @@ public class F_Grabar extends Fragment implements View.OnClickListener, View.OnL
 
         return grabarView;
     }
-
 
     public void asignarClickListenersABotones(View v) {
 
@@ -102,6 +120,8 @@ public class F_Grabar extends Fragment implements View.OnClickListener, View.OnL
         btAtras = (ImageButton) v.findViewById(R.id.imbtAtras);
         btAtras.setOnClickListener(this);
         btAtras.setOnLongClickListener(this);
+
+        setLocationListeners(getContext());
     }
 
 //CLICK LISTENERS
@@ -172,7 +192,11 @@ public class F_Grabar extends Fragment implements View.OnClickListener, View.OnL
 
             case R.id.bttnGuardar:
 
-                //TODO: Definir guardado de audio en firebase
+                Aviso aviso = new Aviso(nombreArchivo+".3gp"
+                        , lugarActual.getLatitude()
+                        , lugarActual.getLongitude());
+
+                ref.child("Avisos").child("Aviso"+numAzar).setValue(aviso);
 
                 Intent intentGuardar = new Intent(this.getContext(), A_Main.class);
                 startActivity(intentGuardar);
@@ -203,6 +227,41 @@ public class F_Grabar extends Fragment implements View.OnClickListener, View.OnL
     }
 //FIN CLICK LISTENERS
 
+//LOCATION LISTENERS...........................................................................
+
+    public void setLocationListeners(Context context) {
+        locManager = (LocationManager) getContext().getSystemService(context.LOCATION_SERVICE);
+
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return ;
+        }
+        locManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+    }
+
+    private int checkSelfPermission(String accessFineLocation) {return 0;}
+
+    @Override
+    public void onLocationChanged(Location location) {
+        locListener = this;
+        if (location!=null) {
+            lugarActual = location;
+        }else{
+            msgToast(2, "No se encuentra Location");
+        }
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) { }
+
+    @Override
+    public void onProviderEnabled(String provider) { msgToast(3, "Red Activada"); }
+
+    @Override
+    public void onProviderDisabled(String provider) { msgToast(3, "Red Desactivada"); }
+
+//FIN LOCATION LISTENERS
+
 
     public void msgToast(int numTag, String msg) {
         switch (numTag) {
@@ -217,4 +276,6 @@ public class F_Grabar extends Fragment implements View.OnClickListener, View.OnL
                 break;
         }
     }
+
+
 }

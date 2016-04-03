@@ -30,18 +30,16 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
-import org.osmdroid.views.overlay.compass.CompassOverlay;
-import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import app.m08yoaviso.BBDD.Aviso;
 import app.m08yoaviso.BBDD.ReferenciaBD;
-import app.m08yoaviso.BBDD.Yoaviso;
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class F_Main extends Fragment implements LocationListener, View.OnLongClickListener {
+public class F_Main extends Fragment implements LocationListener {
 
 
     //CONSTRUCTOR
@@ -70,12 +68,8 @@ public class F_Main extends Fragment implements LocationListener, View.OnLongCli
     private int radioAgrupacion = 25; //metros para agrupar
     private boolean hayControlZoom = true;
     private boolean hayControlMultiTouch = true;
-    private boolean hayCentradoInicial = true;
     private boolean hayPrecisionOverlay = true;
     private int zoomInicial = 15; //metros de zoom iniciales
-
-
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -83,11 +77,9 @@ public class F_Main extends Fragment implements LocationListener, View.OnLongCli
         View mainView = inflater.inflate(R.layout.lay_f_main, container, false);
 
 
-
         ReferenciaBD app = (ReferenciaBD) getActivity().getApplication();
         ref = app.getRef();
         map = (MapView) mainView.findViewById(R.id.mapView);
-        map.setOnLongClickListener(this);
         zoomInicial = 100;
 
 
@@ -99,19 +91,8 @@ public class F_Main extends Fragment implements LocationListener, View.OnLongCli
         ReferenciaBD refYoaviso = (ReferenciaBD) getActivity().getApplication();
         ref = refYoaviso.getRef();
 
-
         //Configuracion listeners
         setLocationListeners(getContext());
-
-
-        //TODO borrar despues de definir los POJOs y comenzaar a grabar
-        //Registros añadidos a Firebase para pruebas
-        //addAvisosPrueba(10, ref);
-
-        //TODO //fin de los registros de prueba
-
-
-
 
         return mainView;
     }
@@ -160,8 +141,10 @@ public class F_Main extends Fragment implements LocationListener, View.OnLongCli
 
         //Setear la escala del mapa
         scaleBarOverlay = new ScaleBarOverlay(map);
-        scaleBarOverlay.setCentred(hayCentradoInicial);
+        scaleBarOverlay.setCentred(true);
         scaleBarOverlay.setScaleBarOffset(metricaDelMapa.widthPixels / 2, 10);
+
+        //Añadir boton de grabacion
 
 
         //Añadir los setters al overlay
@@ -173,24 +156,23 @@ public class F_Main extends Fragment implements LocationListener, View.OnLongCli
     public void drawMarkers (Context context){
         setAgrupacionMarkers(context, radioAgrupacion);
 
-        Firebase notas = ref.child("prueba").child("Notas");
-        notas.addValueEventListener(new ValueEventListener() {
+        Firebase avisos = ref.child("Avisos");
+        avisos.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot notasFireBase : dataSnapshot.getChildren()) {
-/*
-                    Nota nota = notasFireBase.getValue(Nota.class);
-                    Marker notaMarker = new Marker(map);
-                    GeoPoint gp = new GeoPoint(nota.getLatitud(), nota.getLongitud());
+                for (DataSnapshot avisosFireBase : dataSnapshot.getChildren()) {
 
-                    notaMarker.setPosition(gp);
-                    notaMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-                    notaMarker.setIcon(getResources().getDrawable(android.R.drawable.ic_menu_info_details));
-                    notaMarker.setTitle(nota.getTitulo());
-                    notaMarker.setAlpha(0.7f);
-*/
-                    //agrupacionNotaMarkers.add(notaMarker);
+                    Aviso aviso = avisosFireBase.getValue(Aviso.class);
+                    Marker avisoMarker = new Marker(map);
+                    GeoPoint gp = new GeoPoint(aviso.getLatitud(), aviso.getLongitud());
 
+                    avisoMarker.setPosition(gp);
+                    avisoMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                    avisoMarker.setIcon(getResources().getDrawable(android.R.drawable.ic_menu_view));
+                    avisoMarker.setTitle(aviso.getAvisoId());
+                    avisoMarker.setAlpha(0.7f);
+
+                    agrupacionAvisoMarkers.add(avisoMarker);
                 }
                 agrupacionAvisoMarkers.invalidate();
                 map.invalidate();
@@ -214,15 +196,6 @@ public class F_Main extends Fragment implements LocationListener, View.OnLongCli
 
         agrupacionAvisoMarkers.setIcon(clusterIconBm);
         agrupacionAvisoMarkers.setRadius(radio);
-    }
-
-    public void addAvisosPrueba(int numVeces, Firebase firebase){
-        for (int i = 0; i < numVeces ; i++) {
-
-
-
-
-        }
     }
 
     public void msgToast(int numTag, String msg) {
@@ -274,14 +247,6 @@ public class F_Main extends Fragment implements LocationListener, View.OnLongCli
 //FIN DE METODOS PARA LOCATION LISTENER.........................................................
 
 //METODOS PARA CLICK LISTENERS................................................................
-    @Override
-    public boolean onLongClick(View v) {
-
-        Intent intentToGrabar = new Intent(getActivity().getApplication(), A_Grabar.class);
-        startActivity(intentToGrabar);
-
-        return false;
-    }
 
 
 }
