@@ -205,6 +205,8 @@ public class F_Grabar extends Fragment implements View.OnClickListener, View.OnL
 
             case R.id.bttnRepetir:
 
+                btGrabar.setVisibility(View.VISIBLE);
+
                 btParar.setVisibility(View.INVISIBLE);
                 btEscuchar.setVisibility(View.INVISIBLE);
                 btRepetir.setVisibility(View.INVISIBLE);
